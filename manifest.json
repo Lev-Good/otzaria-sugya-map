@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "com.levgood.sugya-map",
+  "name": "מבנה הסוגיא",
+  "version": "1.0.0",
+  "description": "תרשים זרימה ויזואלי ללימוד סוגיה בחברותא — 6 שלבים מסתעפים, כותרת 'ולכן', חלונית מקורות מובנית מאוצריא, מדריך אינטראקטיבי וייצוא PDF.",
+  "author": "לב טוב",
+  "homepage": "https://github.com/Lev-Good/otzaria-sugya-map",
+  "stability": "stable",
+  "entrypoint": "index.html",
+  "icon": "icon/icon.png",
+  "minAppVersion": "0.9.97",
+  "sdkVersion": "1.x",
+  "permissions": [
+    "library.books.read",
+    "library.content.read",
+    "reader.open",
+    "fs.user_files.read",
+    "fs.user_files.write",
+    "ui.create_shortcut"
+  ],
+  "network": {
+    "enabled": false,
+    "allowlist": []
+  },
+  "contributes": {
+    "toolTab": {
+      "title": "מבנה הסוגיא",
+      "order": 350,
+      "defaultPinned": true,
+      "iconName": "flowchart_24_regular"
+    },
+    "publishedDataTypes": []
+  }
+}

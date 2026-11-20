@@ -1,0 +1,35 @@
+name: Validate, Build & Publish Otzaria Plugin
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  validate-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate, build & publish to Otzaria Store
+        id: plugin
+        uses: Otzaria/otzaria-plugin-validator@v1
+        with:
+          path: '.'
+          build: 'true'
+          fail-on-warnings: 'true'
+          reports-consent: 'true'
+          screenshots: |
+            screenshots/main.png
+          otzaria-user: ${{ secrets.OTZARIA_USER }}
+          otzaria-password: ${{ secrets.OTZARIA_PASSWORD }}
+
+      - name: Upload built .otzplugin artifact
+        if: steps.plugin.outputs.plugin-file != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: otzaria-sugya-map-plugin
+          path: ${{ steps.plugin.outputs.plugin-file }}

@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>מבנה הסוגיא — תרשים זרימה ללימוד בחברותא</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="card-style-modern card-width-normal content-font-ui palette-colorful">
+
+  <div class="app-shell">
+
+    <!-- סרגל כותרת עליון קבוע בסגנון AppTopBar של אוצריא -->
+    <header class="topbar">
+      <div class="topbar-side topbar-start">
+        <div class="topbar-brand">
+          <span class="topbar-logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="8" y="3" width="8" height="4" rx="1"/>
+              <rect x="2" y="17" width="7" height="4" rx="1"/>
+              <rect x="15" y="17" width="7" height="4" rx="1"/>
+              <path stroke-linecap="round" d="M12 7v4M5.5 17v-3a2 2 0 012-2h9a2 2 0 012 2v3"/>
+            </svg>
+          </span>
+          <h1>מבנה הסוגיא</h1>
+        </div>
+
+        <span class="topbar-divider topbar-hide-sm" aria-hidden="true"></span>
+
+        <!-- כפתור בולט וברור לפתיחת ניהול הסוגיות שלי -->
+        <button id="openSugyotBtn" class="topbar-sugyot-btn" type="button" title="לחץ לניהול הסוגיות השמורות, יצירת סוגיה חדשה ומעבר בין סוגיות">
+          <span class="topbar-sugyot-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/>
+            </svg>
+          </span>
+          <span class="topbar-sugyot-tag">הסוגיות שלי</span>
+          <span class="topbar-sugyot-sep" aria-hidden="true">|</span>
+          <span id="sugyaChipLabel" class="topbar-sugyot-name">זה נהנה וזה לא חסר</span>
+          <span id="sugyaCountBadge" class="topbar-sugyot-count">1</span>
+          <span class="topbar-sugyot-chevron" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"/>
+            </svg>
+          </span>
+        </button>
+      </div>
+
+      <div class="topbar-side topbar-end">
+        <button id="undoBtn" class="topbar-btn topbar-hide-sm" type="button" title="בטל פעולה (Ctrl+Z)" aria-label="בטל פעולה" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l-4-4 4-4"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 10h10a4 4 0 110 8h-3"/>
+          </svg>
+        </button>
+
+        <button id="redoBtn" class="topbar-btn topbar-hide-sm" type="button" title="בצע שוב (Ctrl+Y)" aria-label="בצע שוב" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 14l4-4-4-4"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 10H9a4 4 0 100 8h3"/>
+          </svg>
+        </button>
+
+        <div class="topbar-zoom-group" aria-label="שליטת זום">
+          <button id="zoomOutBtn" class="topbar-zoom-btn" type="button" title="הקטן תצוגה" aria-label="הקטן תצוגה">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+              <path stroke-linecap="round" d="M5 12h14"/>
+            </svg>
+          </button>
+          <button id="zoomResetBtn" class="topbar-zoom-btn topbar-zoom-val" type="button" title="איפוס זום ל-100%">100%</button>
+          <button id="zoomInBtn" class="topbar-zoom-btn" type="button" title="הגדל תצוגה" aria-label="הגדל תצוגה">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+              <path stroke-linecap="round" d="M12 5v14m-7-7h14"/>
+            </svg>
+          </button>
+          <button id="zoomFitBtn" class="topbar-zoom-btn" type="button" title="התאם את כל התרשים למסך" aria-label="התאם למסך">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>
+            </svg>
+          </button>
+        </div>
+
+        <button id="startTourBtn" class="topbar-btn topbar-btn-outlined" type="button" title="מדריך אינטראקטיבי שלב אחר שלב">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/>
+            <path stroke-linecap="round" d="M12 17h.01"/>
+          </svg>
+          <span class="topbar-hide-sm">מדריך</span>
+        </button>
+
+        <button id="openSettingsBtn" class="topbar-btn" type="button" title="הגדרות תצוגה, כותרת 'ולכן', צבעים, דוגמה וייצוא PDF" aria-label="הגדרות">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="3"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+          </svg>
+          <span class="topbar-hide-md">הגדרות</span>
+          <span id="settingsActiveDot" class="topbar-active-dot hidden" aria-hidden="true"></span>
+        </button>
+
+        <div class="popover-anchor">
+          <button id="moreMenuBtn" class="topbar-btn" type="button" title="פעולות נוספות" aria-label="פעולות נוספות" aria-haspopup="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="12" cy="5" r="1.5" fill="currentColor"/>
+              <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+              <circle cx="12" cy="19" r="1.5" fill="currentColor"/>
+            </svg>
+          </button>
+          <div id="moreMenuPopover" class="popover-menu" role="menu">
+            <button id="menuExportJson" class="popover-item" type="button" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/></svg>
+              <span>ייצוא גיבוי סוגיה (JSON)</span>
+            </button>
+            <button id="menuExportAllJson" class="popover-item" type="button" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>
+              <span>ייצוא כל הסוגיות (JSON)</span>
+            </button>
+            <button id="menuImportJson" class="popover-item" type="button" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M17 8l-5-5-5 5M12 3v12"/></svg>
+              <span>ייבוא מקובץ גיבוי (JSON)</span>
+            </button>
+            <div class="popover-sep"></div>
+            <button id="menuExpandAll" class="popover-item" type="button" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M7 10l5 5 5-5"/></svg>
+              <span>פתח את כל הענפים</span>
+            </button>
+            <button id="menuCollapseAll" class="popover-item" type="button" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M7 14l5-5 5 5"/></svg>
+              <span>קפל ענפי משנה</span>
+            </button>
+            <div class="popover-sep"></div>
+            <button id="menuStartTour" class="popover-item" type="button" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><path stroke-linecap="round" d="M12 17h.01"/></svg>
+              <span>מדריך שימוש שלב אחר שלב</span>
+            </button>
+            <button id="menuAbout" class="popover-item" type="button" role="menuitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 16v-4M12 8h.01"/></svg>
+              <span>אודות וקיצור דרך</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- פס משני: שם סוגיה לעריכה מהירה + מקרא 6 שלבים אינטראקטיבי -->
+    <div class="subbar no-print">
+      <div class="sugya-title-wrap">
+        <span class="sugya-title-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+        </span>
+        <input id="sugyaTitleInput" class="sugya-title-input" type="text" placeholder="שם הסוגיה..." aria-label="שם הסוגיה הנוכחית">
+      </div>
+
+      <div id="legendBar" class="legend-bar" aria-label="מקרא ששת השלבים"></div>
+
+      <div class="subbar-actions">
+        <button id="clearChartBtn" class="subbar-link-btn danger" type="button" title="נקה את כל השלבים בסוגיה הנוכחית">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m1 0l-1 14a2 2 0 01-2 2H9a2 2 0 01-2-2L6 6"/></svg>
+          <span>נקה</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- אזור עבודה מפוצל: קנבס התרשים + חלונית צד מובנית לקריאת מקורות -->
+    <div class="workspace-split">
+      <main id="canvasViewport" class="canvas-viewport show-dots">
+        <div id="canvasStage" class="canvas-stage">
+          <div class="print-header">
+            <div id="printTitle" class="print-title"></div>
+            <div class="print-subtitle">תרשים מבנה הסוגיא — אוצריא</div>
+          </div>
+          <div id="zoomWrapper" class="zoom-wrapper">
+            <div id="treeRoot" class="tree-root"></div>
+          </div>
+        </div>
+      </main>
+
+      <div id="readerResizer" class="reader-resizer hidden no-print" title="גרור לשינוי רוחב חלונית המקור"></div>
+
+      <!-- חלונית צד מובנית לקריאת מקורות עם סגירה בלחיצה אחת והחלפה מיידית בין מקורות -->
+      <aside id="sourceReaderPane" class="source-reader-pane hidden no-print" aria-label="חלונית קריאת מקור">
+        <div class="reader-pane-header">
+          <div class="reader-pane-heading">
+            <div id="readerPaneTitle" class="reader-pane-title">מקור</div>
+            <div id="readerPaneSub" class="reader-pane-sub"></div>
+          </div>
+          <div class="reader-pane-controls">
+            <button id="readerOpenTabBtn" class="reader-ctrl-btn" type="button" title="פתח ספר זה בכרטיסייה נפרדת באוצריא">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 3h6v6M10 14L21 3"/>
+              </svg>
+              <span>פתח בטאב</span>
+            </button>
+            <button id="readerCloseBtn" class="reader-close-btn" type="button" title="סגור חלונית מקור (Esc)" aria-label="סגור חלונית מקור">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+                <path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+              <span>סגור</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="reader-pane-toolbar">
+          <div class="reader-pane-controls">
+            <button id="readerHistoryBackBtn" class="reader-ctrl-btn" type="button" title="חזור למקור הקודם" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+              <span>מקור קודם</span>
+            </button>
+          </div>
+          <div class="reader-pane-controls">
+            <button id="readerFontDecBtn" class="reader-ctrl-btn" type="button" title="הקטן גופן">א-</button>
+            <button id="readerFontIncBtn" class="reader-ctrl-btn" type="button" title="הגדל גופן">א+</button>
+          </div>
+        </div>
+
+        <div id="readerPaneBody" class="reader-pane-body">
+          <div id="readerPaneContent" class="reader-pane-content"></div>
+        </div>
+
+        <div id="readerPaneFooter" class="reader-pane-footer">
+          <button id="readerPrevChunkBtn" class="reader-ctrl-btn" type="button">↑ קטע קודם</button>
+          <span id="readerRangeLabel" class="reader-pane-sub"></span>
+          <button id="readerNextChunkBtn" class="reader-ctrl-btn" type="button">קטע הבא ↓</button>
+        </div>
+      </aside>
+    </div>
+
+  </div>
+
+  <!-- שכבת רקע צפה לפאנלים הצדדיים -->
+  <div id="overlayScrim" class="overlay-scrim"></div>
+
+  <!-- פאנל הגדרות צף בסגנון ContextOverlayPanel של אוצריא -->
+  <aside id="settingsPanel" class="overlay-panel" aria-label="הגדרות תרשים">
+    <div class="panel-head">
+      <span class="panel-head-title">הגדרות תרשים</span>
+      <button id="closeSettingsBtn" class="modal-close-btn" type="button" aria-label="סגור הגדרות">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="panel-body">
+      <!-- כרטיס 1: כותרת "ולכן" -->
+      <section class="settings-card">
+        <h3 class="settings-card-title">כותרת מעוצבת "ולכן" בחלוניות</h3>
+        <div class="settings-card-body">
+          <div class="settings-row stacked">
+            <div>
+              <div class="settings-row-title">היכן להציג את הכותרת?</div>
+              <div class="settings-row-subtitle">הוסף כותרת בראש כל חלונית או רק בסוג שלב אחד</div>
+            </div>
+            <div id="segVelachenMode" class="segmented full-width"></div>
+          </div>
+
+          <div id="singleTypeRow" class="settings-row stacked hidden">
+            <div class="settings-row-title">בחר את סוג החלונית היחיד:</div>
+            <div id="singleTypeButtons" class="single-type-grid"></div>
+          </div>
+
+          <div class="settings-row stacked">
+            <label for="velachenTextInput" class="settings-row-title">נוסח הכותרת (ברירת מחדל: ולכן)</label>
+            <input id="velachenTextInput" class="input-field" type="text" value="ולכן" placeholder="ולכן">
+            <div class="velachen-preview-box">
+              <span class="velachen-preview-label">תצוגה מקדימה:</span>
+              <div class="velachen-preview-card">
+                <div class="velachen-banner">
+                  <span class="velachen-star">✦</span>
+                  <span id="velachenPreviewText" class="velachen-text">ולכן</span>
+                  <span class="velachen-star">✦</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- כרטיס 2: עיצוב, צבעים ותצוגה -->
+      <section class="settings-card">
+        <h3 class="settings-card-title">צבעים, עיצוב ותצוגה</h3>
+        <div class="settings-card-body">
+          <div class="settings-row stacked">
+            <div>
+              <div class="settings-row-title">ערכת צבעים</div>
+              <div class="settings-row-subtitle">בחר בין צבעוניות מלאה לבין צבעי אוצריא עדינים וחיוורים</div>
+            </div>
+            <div id="segColorPalette" class="segmented full-width"></div>
+          </div>
+
+          <div class="settings-row stacked">
+            <div>
+              <div class="settings-row-title">סגנון חלוניות</div>
+              <div class="settings-row-subtitle">מודרני או סגנון שכבות קלאסי</div>
+            </div>
+            <div id="segCardStyle" class="segmented full-width"></div>
+          </div>
+
+          <div class="settings-row stacked">
+            <div class="settings-row-title">רוחב חלוניות</div>
+            <div id="segCardWidth" class="segmented full-width"></div>
+          </div>
+
+          <div class="settings-row">
+            <div>
+              <div class="settings-row-title">גופן טקסט בחלוניות</div>
+              <div class="settings-row-subtitle">גופן ממשק או גופן הקריאה של הספרים</div>
+            </div>
+            <div id="segContentFont" class="segmented"></div>
+          </div>
+
+          <div class="settings-row">
+            <div>
+              <div class="settings-row-title">רקע נקודות בלוח</div>
+              <div class="settings-row-subtitle">מסייע להתמצאות בתרשימים רחבים</div>
+            </div>
+            <button id="switchShowDots" class="switch on" type="button" role="switch" aria-checked="true" aria-label="רקע נקודות בלוח"></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- כרטיס 3: ייצוא ל-PDF, הדפסה ודוגמה מוכנה -->
+      <section class="settings-card">
+        <h3 class="settings-card-title">ייצוא ל-PDF, הדפסה ודוגמה</h3>
+        <div class="settings-card-body">
+          <div class="settings-row stacked">
+            <div class="settings-row-title">כיוון עמוד ב-PDF והדפסה</div>
+            <div id="segPdfOrientation" class="segmented full-width"></div>
+          </div>
+
+          <div class="settings-row stacked">
+            <div class="settings-action-grid">
+              <button id="settingsExportPdfBtn" class="btn-primary" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path stroke-linecap="round" stroke-linejoin="round" d="M14 2v6h6M9 13h6M9 17h4"/></svg>
+                <span>ייצוא ל-PDF</span>
+              </button>
+              <button id="settingsPrintBtn" class="btn-secondary" type="button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>
+                <span>הדפסה</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="settings-row stacked">
+            <div>
+              <div class="settings-row-title">תרשים לדוגמה</div>
+              <div class="settings-row-subtitle">טען את הדוגמה המוכנה "זה נהנה וזה לא חסר" (בבא קמא כ׳)</div>
+            </div>
+            <button id="settingsLoadDemoBtn" class="btn-secondary settings-action-full" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+              <span>טען תרשים דוגמה מוכנה</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- כרטיס 4: קריאת מקורות ומדריך -->
+      <section class="settings-card">
+        <h3 class="settings-card-title">מקורות באוצריא והדרכה</h3>
+        <div class="settings-card-body">
+          <div class="settings-row">
+            <div>
+              <div class="settings-row-title">פתיחת מקור בחלונית צד מובנית</div>
+              <div class="settings-row-subtitle">מציג את המקור לצד התרשים עם סגירה מהירה והחלפה חלקה</div>
+            </div>
+            <button id="switchSidePane" class="switch on" type="button" role="switch" aria-checked="true" aria-label="פתיחת מקור בחלונית צד מובנית"></button>
+          </div>
+
+          <div class="settings-row stacked">
+            <button id="settingsStartTourBtn" class="btn-secondary settings-action-full" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><path stroke-linecap="round" d="M12 17h.01"/></svg>
+              <span>הפעל מדריך שימוש צעד-אחר-צעד</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </aside>
+
+  <!-- פאנל הסוגיות שלי (ניהול מספר סוגיות שמורות) -->
+  <aside id="sugyotPanel" class="overlay-panel panel-end" aria-label="הסוגיות השמורות שלי">
+    <div class="panel-head">
+      <span class="panel-head-title">הסוגיות שלי</span>
+      <button id="closeSugyotBtn" class="modal-close-btn" type="button" aria-label="סגור רשימת סוגיות">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="panel-body">
+      <div class="sugya-drawer-toolbar">
+        <button id="newSugyaBtn" class="btn-primary" type="button">+ סוגיה חדשה</button>
+        <button id="newDemoSugyaBtn" class="btn-secondary" type="button">דוגמה (ב״ק כ׳)</button>
+      </div>
+
+      <div class="sugya-drawer-toolbar">
+        <input id="sugyaSearchInput" class="input-field" type="text" placeholder="חפש סוגיה שמורה..." aria-label="חיפוש סוגיה">
+      </div>
+
+      <div id="sugyaListContainer" class="sugya-list"></div>
+    </div>
+  </aside>
+
+  <!-- מודאל בחירת שלב (הוספת שלב או החלפת סוג שלב קיים) -->
+  <div id="stepPickerModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="pickerTitle">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <h2 id="pickerTitle" class="modal-title">בחר סוג שלב להוספה</h2>
+          <p id="pickerSubtitle" class="modal-subtitle">ניתן לפתוח מחדש את כל 6 האפשרויות מכל שלב בתרשים</p>
+        </div>
+        <button id="closePickerBtn" class="modal-close-btn" type="button" aria-label="סגור">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="stepOptionsGrid" class="step-options-grid"></div>
+        <div class="picker-kbd-hint">טיפ: ניתן גם ללחוץ על מקשי הספרות 1 עד 6 במקלדת לבחירה מהירה</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- מודאל קישור מקור באוצריא -->
+  <div id="sourceModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="sourceModalTitle">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <h2 id="sourceModalTitle" class="modal-title">קישור למקור באוצריא</h2>
+          <p class="modal-subtitle">קשר שלב זה לספר ודף באוצריא כדי לפתוח אותו מיד בחלונית הצד</p>
+        </div>
+        <button id="closeSourceModalBtn" class="modal-close-btn" type="button" aria-label="סגור">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="openTabsSection">
+          <div class="source-section-label">ספרים פתוחים כעת באוצריא:</div>
+          <div id="openTabsResults" class="source-results-list"></div>
+        </div>
+
+        <div>
+          <div class="source-section-label">חפש מקור בספריית אוצריא:</div>
+          <input id="sourceSearchInput" class="input-field" type="text" placeholder="לדוגמה: בבא קמא כ, רמב״ם גזילה ג, שו״ע חו״מ..." aria-label="חיפוש מקור באוצריא">
+        </div>
+
+        <div id="sourceSearchResults" class="source-results-list"></div>
+      </div>
+      <div class="modal-footer">
+        <button id="unlinkSourceBtn" class="btn-secondary hidden" type="button">הסר קישור קיים</button>
+        <button id="cancelSourceModalBtn" class="btn-secondary" type="button">סגור</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- מודאל אודות וקיצור דרך -->
+  <div id="aboutModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="aboutModalTitle">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="about-hero">
+          <span class="topbar-logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="8" y="3" width="8" height="4" rx="1"/>
+              <rect x="2" y="17" width="7" height="4" rx="1"/>
+              <rect x="15" y="17" width="7" height="4" rx="1"/>
+              <path stroke-linecap="round" d="M12 7v4M5.5 17v-3a2 2 0 012-2h9a2 2 0 012 2v3"/>
+            </svg>
+          </span>
+          <div>
+            <h2 id="aboutModalTitle" class="modal-title">מבנה הסוגיא</h2>
+            <p id="aboutVersionText" class="modal-subtitle">גרסה 1.0.0 · נוצר ע״י לב טוב · תוסף לאוצריא</p>
+          </div>
+        </div>
+        <button id="closeAboutBtn" class="modal-close-btn" type="button" aria-label="סגור">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>כלי ויזואלי לבניית תרשים זרימה של סוגיה ומהלך לימוד בחברותא, הכולל 6 שלבים מסתעפים, כותרת "ולכן" גמישה, ערכת צבעי אוצריא עדינה, חלונית קריאת מקורות מובנית, מדריך אינטראקטיבי וייצוא נקי ל-PDF.</p>
+        <div class="about-meta-list">
+          <div><strong>יוצר:</strong> לב טוב</div>
+          <div><strong>קיצורי מקלדת:</strong></div>
+          <div>• <code>Ctrl+Z</code> / <code>Ctrl+Y</code> — ביטול / ביצוע שוב</div>
+          <div>• <code>Ctrl + גלגלת</code> — הגדלה והקטנה של התרשים</div>
+          <div>• <code>גרירת רקע הלוח</code> — הזזה חופשית של התרשים</div>
+          <div>• <code>1–6</code> (כאשר חלון בחירת השלב פתוח) — הוספה מהירה</div>
+          <div>• <code>Esc</code> — סגירת חלונית מקור / הגדרות / מדריך</div>
+        </div>
+        <div id="aboutShortcutsArea" class="about-shortcuts hidden">
+          <button id="createDesktopShortcutBtn" class="btn-secondary" type="button">צור קיצור דרך בשולחן העבודה</button>
+          <button id="createStartShortcutBtn" class="btn-secondary hidden" type="button">הוסף לתפריט ההתחל</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="aboutStartTourBtn" class="btn-secondary" type="button">הפעל מדריך</button>
+        <button id="closeAboutFooterBtn" class="btn-primary" type="button">סגור</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- שכבת מדריך אינטראקטיבי שלב-אחר-שלב -->
+  <div id="tourLayer" class="tour-layer hidden" role="dialog" aria-modal="true" aria-labelledby="tourTitle">
+    <div id="tourBackdropFull" class="tour-backdrop-full hidden"></div>
+    <div id="tourSpotlight" class="tour-spotlight hidden"></div>
+    <div id="tourPopover" class="tour-popover">
+      <div class="tour-head">
+        <span id="tourStepBadge" class="tour-step-badge">שלב 1 מתוך 7</span>
+        <button id="tourCloseBtn" class="modal-close-btn" type="button" aria-label="סגור מדריך">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <h3 id="tourTitle" class="tour-title"></h3>
+      <p id="tourText" class="tour-text"></p>
+      <div id="tourDots" class="tour-dots"></div>
+      <div class="tour-actions">
+        <button id="tourSkipBtn" class="btn-secondary" type="button">סגור מדריך</button>
+        <div class="tour-nav-btns">
+          <button id="tourPrevBtn" class="btn-secondary" type="button">הקודם</button>
+          <button id="tourNextBtn" class="btn-primary" type="button">הבא</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- מודאל אישור (fallback מחוץ לאוצריא) -->
+  <div id="confirmModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="modal-dialog compact">
+      <div class="modal-header">
+        <h2 id="confirmTitle" class="modal-title">אישור פעולה</h2>
+      </div>
+      <div class="modal-body">
+        <p id="confirmMessage"></p>
+      </div>
+      <div class="modal-footer">
+        <button id="confirmCancelBtn" class="btn-secondary" type="button">ביטול</button>
+        <button id="confirmOkBtn" class="btn-danger" type="button">אישור</button>
+      </div>
+    </div>
+  </div>
+
+  <input id="importJsonInput" type="file" accept=".json" class="hidden">
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/otzaria-bridge.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
