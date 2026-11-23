@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "com.levgood.sugya-map",
   "name": "מבנה הסוגיא",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "תרשים זרימה ויזואלי ללימוד סוגיה בחברותא — 6 שלבים מסתעפים, כותרת 'ולכן', חלונית מקורות מובנית מאוצריא, מדריך אינטראקטיבי וייצוא PDF.",
   "author": "לב טוב",
   "homepage": "https://github.com/Lev-Good/otzaria-sugya-map",

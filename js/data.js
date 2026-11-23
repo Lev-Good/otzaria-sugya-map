@@ -64,6 +64,7 @@
     cardWidth: 'normal',        // 'compact' | 'normal' | 'wide'
     contentFont: 'ui',          // 'ui' | 'book'
     showDots: true,
+    showSources: false,
     openInSidePane: true,
     pdfOrientation: 'auto',     // 'auto' | 'landscape' | 'portrait'
     readerFontSize: 19,

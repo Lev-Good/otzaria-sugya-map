@@ -67,7 +67,7 @@
               <path stroke-linecap="round" d="M5 12h14"/>
             </svg>
           </button>
-          <button id="zoomResetBtn" class="topbar-zoom-btn topbar-zoom-val" type="button" title="איפוס זום ל-100%">100%</button>
+          <button id="zoomResetBtn" class="topbar-zoom-btn topbar-zoom-val" type="button" title="איפוס זום (70% / 100%)">70%</button>
           <button id="zoomInBtn" class="topbar-zoom-btn" type="button" title="הגדל תצוגה" aria-label="הגדל תצוגה">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
               <path stroke-linecap="round" d="M12 5v14m-7-7h14"/>
@@ -361,6 +361,14 @@
         <h3 class="settings-card-title">מקורות באוצריא והדרכה</h3>
         <div class="settings-card-body">
           <div class="settings-row">
+            <div>
+              <div class="settings-row-title">הצג קישור למקורות בחלוניות</div>
+              <div class="settings-row-subtitle">מוסיף כפתור קישור ותגית מקור מאוצריא בתוך חלוניות התרשים</div>
+            </div>
+            <button id="switchShowSources" class="switch" type="button" role="switch" aria-checked="false" aria-label="הצג קישור למקורות בחלוניות"></button>
+          </div>
+
+          <div id="sidePaneSettingRow" class="settings-row hidden">
             <div>
               <div class="settings-row-title">פתיחת מקור בחלונית צד מובנית</div>
               <div class="settings-row-subtitle">מציג את המקור לצד התרשים עם סגירה מהירה והחלפה חלקה</div>

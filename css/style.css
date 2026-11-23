@@ -92,11 +92,12 @@
   --color-step-teshuva-text: #5B21B6;
   --color-step-teshuva-tab: #6D28D9;
 
-  --color-step-maskana: #0D9488;
-  --color-step-maskana-border: #2DD4BF;
-  --color-step-maskana-bg: #CCFBF1;
-  --color-step-maskana-text: #115E59;
-  --color-step-maskana-tab: #0F766E;
+  --color-step-maskana: #1E293B;
+  --color-step-maskana-border: #334155;
+  --color-step-maskana-bg: #E2E8F0;
+  --color-step-maskana-text: #0F172A;
+  --color-step-maskana-tab: #1E293B;
+  --color-step-maskana-card-bg: #F8FAFC;
 
   /* --- באנר כותרת "ולכן" --- */
   --color-velachen-bg-edge: rgba(245, 158, 11, 0.14);
@@ -109,11 +110,12 @@
   --font-ui: 'Rubik', 'Segoe UI', system-ui, sans-serif;
   --font-main: 'FrankRuhlCLM', 'David', serif;
   --font-card-content: var(--font-ui);
-  --font-size-ui: 14px;
-  --font-size-base: 18px;
-  --font-size-card-text: 15px;
+  --font-size-ui: 13.5px;
+  --font-size-base: 17px;
+  --font-size-card-text: 13.5px;
+  --font-size-maskana-text: 15px;
   --font-size-reader: 19px;
-  --line-height: 1.55;
+  --line-height: 1.5;
 
   /* --- מידות, צורות וצפיפות --- */
   --radius: 8px;
@@ -121,7 +123,8 @@
   --radius-lg: 12px;
   --radius-pill: 999px;
   --top-bar-height: 56px;
-  --card-width: 292px;
+  --card-width: 252px;
+  --maskana-card-width: 278px;
   --reader-pane-width: 390px;
 }
 
@@ -175,11 +178,12 @@ body.dark-mode {
   --color-step-teshuva-text: #DDD6FE;
   --color-step-teshuva-tab: #6D28D9;
 
-  --color-step-maskana: #2DD4BF;
-  --color-step-maskana-border: #14B8A6;
-  --color-step-maskana-bg: rgba(20, 184, 166, 0.22);
-  --color-step-maskana-text: #99F6E4;
-  --color-step-maskana-tab: #0F766E;
+  --color-step-maskana: #CBD5E1;
+  --color-step-maskana-border: #94A3B8;
+  --color-step-maskana-bg: rgba(148, 163, 184, 0.24);
+  --color-step-maskana-text: #F1F5F9;
+  --color-step-maskana-tab: #475569;
+  --color-step-maskana-card-bg: #222834;
 
   --color-velachen-bg-edge: rgba(245, 158, 11, 0.16);
   --color-velachen-bg-mid: rgba(251, 191, 36, 0.30);
@@ -227,6 +231,7 @@ body.palette-otzaria {
   --color-step-maskana-bg: color-mix(in srgb, var(--color-primary) 13%, var(--color-surface-container-low));
   --color-step-maskana-text: var(--color-primary);
   --color-step-maskana-tab: color-mix(in srgb, var(--color-primary) 50%, var(--color-surface-container-highest));
+  --color-step-maskana-card-bg: color-mix(in srgb, var(--color-primary) 6%, var(--surface-card));
 
   --color-velachen-bg-edge: color-mix(in srgb, var(--color-primary) 6%, var(--color-surface-container-low));
   --color-velachen-bg-mid: color-mix(in srgb, var(--color-primary) 13%, var(--color-surface-container));
@@ -236,11 +241,11 @@ body.palette-otzaria {
 }
 
 /* --- התאמות גודל כרטיס וגופן תוכן --- */
-body.card-width-compact { --card-width: 246px; }
-body.card-width-normal  { --card-width: 292px; }
-body.card-width-wide    { --card-width: 344px; }
-body.content-font-book  { --font-card-content: var(--font-main); --font-size-card-text: 17px; }
-body.content-font-ui    { --font-card-content: var(--font-ui); --font-size-card-text: 14.5px; }
+body.card-width-compact { --card-width: 218px; --maskana-card-width: 244px; }
+body.card-width-normal  { --card-width: 252px; --maskana-card-width: 280px; }
+body.card-width-wide    { --card-width: 300px; --maskana-card-width: 332px; }
+body.content-font-book  { --font-card-content: var(--font-main); --font-size-card-text: 15.5px; --font-size-maskana-text: 17px; }
+body.content-font-ui    { --font-card-content: var(--font-ui); --font-size-card-text: 13.5px; --font-size-maskana-text: 15px; }
 
 /* ============================================================================
    שלד האפליקציה (גובה מלא, ללא גלילת דף ראשית)
@@ -1013,8 +1018,19 @@ button, input, textarea, select {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  align-items: flex-start;
+  align-items: stretch;
   position: relative;
+}
+
+.node-column.is-maskana-leaf {
+  flex: 1 1 auto;
+}
+
+.maskana-drop-stem {
+  width: 2px;
+  flex: 1 1 auto;
+  min-height: 0;
+  background: var(--color-connector);
 }
 
 .tree-child-wrapper {
@@ -1022,7 +1038,7 @@ button, input, textarea, select {
   flex-direction: column;
   align-items: center;
   position: relative;
-  padding: 24px 10px 0 10px;
+  padding: 20px 8px 0 8px;
 }
 
 .tree-child-wrapper::before {
@@ -1031,7 +1047,7 @@ button, input, textarea, select {
   top: 0;
   right: 50%;
   width: 2px;
-  height: 24px;
+  height: 20px;
   background: var(--color-connector);
   transform: translateX(50%);
 }
@@ -1068,6 +1084,26 @@ button, input, textarea, select {
   position: relative;
   width: var(--card-width);
   cursor: default;
+}
+
+/* חלונית מסקנא מודגשת יותר בגודל, בגבול, ברקע ובכתב */
+.step-card-frame.step-type-maskana {
+  width: var(--maskana-card-width);
+}
+
+.step-card-frame.step-type-maskana .step-card {
+  border-width: 2.5px;
+  background: var(--color-step-maskana-card-bg);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.step-card-frame.step-type-maskana .card-textarea {
+  font-size: var(--font-size-maskana-text);
+  font-weight: 700;
+}
+
+.step-card-frame.step-type-maskana .card-subtitle-input {
+  font-weight: 700;
 }
 
 body.card-style-classic .step-card-frame {

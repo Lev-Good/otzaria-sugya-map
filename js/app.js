@@ -11,6 +11,7 @@
   const STORAGE_KEY = 'sugya_workspace_v1';
   const MAX_HISTORY = 40;
   const READER_CHUNK_LINES = 26;
+  const DEFAULT_ZOOM = 0.7;
 
   let workspace = {
     schemaVersion: 1,
@@ -19,7 +20,7 @@
     settings: Object.assign({}, Data.DEFAULT_SETTINGS)
   };
 
-  let currentZoom = 1;
+  let currentZoom = DEFAULT_ZOOM;
   let activeFilterType = null;
 
   // היסטוריית ביטול / ביצוע שוב לסוגיה הפעילה
@@ -315,16 +316,24 @@
   // בניית כרטיס שלב בודד וענפיו
   // ============================================================================
 
-  function createNodeElement(node, siblingsList, siblingIndex, isLastRoot) {
+  function createNodeElement(node, siblingsList, siblingIndex, isLastRoot, isRoot) {
     const meta = Data.getStepMeta(node.type);
     const showVelachen = shouldShowVelachen(node.type);
     const velachenLabel = (workspace.settings.velachenText || 'ולכן').trim() || 'ולכן';
     const hasChildren = Array.isArray(node.children) && node.children.length > 0;
     const isDimmed = activeFilterType && activeFilterType !== node.type;
     const isHighlighted = activeFilterType && activeFilterType === node.type;
+    const isMaskana = node.type === 'maskana';
 
     const column = document.createElement('div');
-    column.className = 'node-column';
+    column.className = 'node-column' + (isMaskana && !hasChildren ? ' is-maskana-leaf' : '');
+
+    // חלונית מסקנא מקבלת קו חיבור אנכי גמיש כך שתרד תמיד עד למטה
+    if (isMaskana && !isRoot) {
+      const dropStem = document.createElement('div');
+      dropStem.className = 'maskana-drop-stem';
+      column.appendChild(dropStem);
+    }
 
     const frame = document.createElement('div');
     frame.className = 'step-card-frame step-type-' + meta.id;
@@ -367,16 +376,18 @@
     const actions = document.createElement('div');
     actions.className = 'card-actions no-print';
 
-    // קישור מקור באוצריא
-    const linkBtn = document.createElement('button');
-    linkBtn.type = 'button';
-    linkBtn.className = 'card-action-btn js-link-source-btn' + (node.source ? ' has-source' : '');
-    linkBtn.title = node.source ? 'ערוך קישור מקור באוצריא' : 'קשר למקור באוצריא';
-    linkBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path stroke-linecap="round" stroke-linejoin="round" d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>';
-    linkBtn.addEventListener('click', function () {
-      openSourceModal(node.id);
-    });
-    actions.appendChild(linkBtn);
+    // קישור מקור באוצריא (מוצג רק אם הופעל בהגדרות)
+    if (workspace.settings.showSources) {
+      const linkBtn = document.createElement('button');
+      linkBtn.type = 'button';
+      linkBtn.className = 'card-action-btn js-link-source-btn' + (node.source ? ' has-source' : '');
+      linkBtn.title = node.source ? 'ערוך קישור מקור באוצריא' : 'קשר למקור באוצריא';
+      linkBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path stroke-linecap="round" stroke-linejoin="round" d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>';
+      linkBtn.addEventListener('click', function () {
+        openSourceModal(node.id);
+      });
+      actions.appendChild(linkBtn);
+    }
 
     // הזזת סדר בין אחים
     if (Array.isArray(siblingsList) && siblingsList.length > 1) {
@@ -484,8 +495,8 @@
     });
     body.appendChild(subtitleInput);
 
-    // תגית מקור מקושר מאוצריא (פותחת בחלונית הצד המובנית!)
-    if (node.source) {
+    // תגית מקור מקושר מאוצריא (מוצגת רק אם הופעל בהגדרות)
+    if (workspace.settings.showSources && node.source) {
       const sourceRow = document.createElement('div');
       sourceRow.className = 'source-chip-row';
 
@@ -622,7 +633,7 @@
         node.children.forEach(function (child, idx) {
           const childWrap = document.createElement('div');
           childWrap.className = 'tree-child-wrapper';
-          childWrap.appendChild(createNodeElement(child, node.children, idx));
+          childWrap.appendChild(createNodeElement(child, node.children, idx, false, false));
           childrenContainer.appendChild(childWrap);
         });
 
@@ -718,7 +729,11 @@
 
     chart.nodes.forEach(function (rootNode, idx) {
       const isLastRoot = (idx === chart.nodes.length - 1);
-      rootEl.appendChild(createNodeElement(rootNode, chart.nodes, idx, isLastRoot));
+      rootEl.appendChild(createNodeElement(rootNode, chart.nodes, idx, isLastRoot, true));
+    });
+
+    requestAnimationFrame(function () {
+      alignMaskanaToBottom();
     });
 
     if (focusNodeId) {
@@ -731,6 +746,41 @@
         }
       }, 40);
     }
+  }
+
+  // יישור חלוניות "6. מסקנא" לתחתית התרשים כך שהקו האנכי יימשך עד למטה
+  function alignMaskanaToBottom() {
+    const rootEl = document.getElementById('treeRoot');
+    if (!rootEl) return;
+    const stems = rootEl.querySelectorAll('.maskana-drop-stem');
+    if (stems.length === 0) return;
+
+    stems.forEach(function (stem) {
+      stem.style.minHeight = '0px';
+    });
+
+    let maxBottom = 0;
+    const nonMaskanaCards = rootEl.querySelectorAll('.step-card-frame:not(.step-type-maskana) .step-card');
+    nonMaskanaCards.forEach(function (card) {
+      const r = card.getBoundingClientRect();
+      if (r.bottom > maxBottom) maxBottom = r.bottom;
+    });
+
+    if (maxBottom <= 0) return;
+    const scale = currentZoom || 1;
+
+    stems.forEach(function (stem) {
+      const col = stem.closest('.node-column');
+      const card = col && col.querySelector('.step-card-frame.step-type-maskana .step-card');
+      if (!card) return;
+      const r = card.getBoundingClientRect();
+      if (r.bottom < maxBottom) {
+        const delta = Math.round((maxBottom - r.bottom) / scale);
+        if (delta > 0) {
+          stem.style.minHeight = delta + 'px';
+        }
+      }
+    });
   }
 
   function renderAll(focusNodeId) {
@@ -957,7 +1007,12 @@
     );
 
     syncSwitch('switchShowDots', s.showDots !== false);
+    syncSwitch('switchShowSources', !!s.showSources);
     syncSwitch('switchSidePane', s.openInSidePane !== false);
+    const sidePaneRow = document.getElementById('sidePaneSettingRow');
+    if (sidePaneRow) {
+      sidePaneRow.classList.toggle('hidden', !s.showSources);
+    }
 
     buildSegmentedControl(
       'segPdfOrientation',
@@ -1030,7 +1085,7 @@
         if (workspace.activeChartId !== chart.id) {
           workspace.activeChartId = chart.id;
           activeFilterType = null;
-          currentZoom = 1;
+          currentZoom = DEFAULT_ZOOM;
           applyZoom();
           resetHistory();
           persistWorkspaceNow();
@@ -1463,9 +1518,9 @@
       text: 'בכל חלונית כותבים כותרת משנה ותוכן חופשי. לחיצה על תגית השלב בראש החלונית מאפשרת להחליף את סוג השלב, וכפתור "+ הוסף המשך" שמתחת לחלונית פותח מחדש את כל 6 האפשרויות להסתעפות.'
     },
     {
-      selector: '.source-chip, .js-link-source-btn',
-      title: 'קישור וקריאת מקורות בחלונית צד מובנית',
-      text: 'לחץ על אייקון הקישור בכל חלונית כדי לקשר דף גמרא או ספר מאוצריא. לחיצה על המקור המקושר תפתח אותו מיד בחלונית צד נוחה עם כפתור "סגור" מהיר — ולחיצה על מקור נוסף תחליף את התצוגה באותה חלונית!'
+      selector: '.source-chip, .js-link-source-btn, #openSettingsBtn',
+      title: 'קישור וקריאת מקורות באוצריא (אופציונלי)',
+      text: 'בברירת מחדל התרשים נקי ללא כפתורי מקורות. אם תרצה לקשר דפי גמרא וספרים מאוצריא ישירות לתוך החלוניות ולפתוח אותם בחלונית צד, תוכל להפעיל זאת בכל עת מתוך תפריט ההגדרות.'
     },
     {
       selector: '#legendBar',
@@ -1648,7 +1703,9 @@
     // זום
     document.getElementById('zoomInBtn').addEventListener('click', function () { setZoom(currentZoom + 0.1); });
     document.getElementById('zoomOutBtn').addEventListener('click', function () { setZoom(currentZoom - 0.1); });
-    document.getElementById('zoomResetBtn').addEventListener('click', function () { setZoom(1); });
+    document.getElementById('zoomResetBtn').addEventListener('click', function () {
+      setZoom(Math.abs(currentZoom - DEFAULT_ZOOM) < 0.02 ? 1 : DEFAULT_ZOOM);
+    });
     document.getElementById('zoomFitBtn').addEventListener('click', fitToScreen);
 
     const viewport = document.getElementById('canvasViewport');
@@ -1799,6 +1856,20 @@
       persistWorkspaceNow();
     });
 
+    document.getElementById('switchShowSources').addEventListener('click', function () {
+      workspace.settings.showSources = !workspace.settings.showSources;
+      syncSwitch('switchShowSources', workspace.settings.showSources);
+      const sidePaneRow = document.getElementById('sidePaneSettingRow');
+      if (sidePaneRow) {
+        sidePaneRow.classList.toggle('hidden', !workspace.settings.showSources);
+      }
+      if (!workspace.settings.showSources && readerState.open) {
+        closeSourceReaderPane();
+      }
+      persistWorkspaceNow();
+      renderTree();
+    });
+
     document.getElementById('switchSidePane').addEventListener('click', function () {
       workspace.settings.openInSidePane = !(workspace.settings.openInSidePane !== false);
       syncSwitch('switchSidePane', workspace.settings.openInSidePane);
@@ -1811,7 +1882,7 @@
       workspace.charts.unshift(fresh);
       workspace.activeChartId = fresh.id;
       activeFilterType = null;
-      currentZoom = 1;
+      currentZoom = DEFAULT_ZOOM;
       applyZoom();
       resetHistory();
       persistWorkspaceNow();
@@ -1826,7 +1897,7 @@
       workspace.charts.unshift(demo);
       workspace.activeChartId = demo.id;
       activeFilterType = null;
-      currentZoom = 1;
+      currentZoom = DEFAULT_ZOOM;
       applyZoom();
       resetHistory();
       persistWorkspaceNow();

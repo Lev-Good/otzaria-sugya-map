@@ -10,7 +10,7 @@
     inOtzaria: typeof window.Otzaria !== 'undefined',
     booted: false,
     pluginId: 'com.levgood.sugya-map',
-    pluginVersion: '1.0.0',
+    pluginVersion: '1.1.0',
     appVersion: '',
     platform: 'web',
     permissions: [],
